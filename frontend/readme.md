@@ -1,0 +1,1 @@
+from mysten labs website, follow the instructions to check how to use the sui contract

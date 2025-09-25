@@ -22,26 +22,32 @@ module workshop_project::bank{
     //import sui table
     use sui::table;
 
-    //Error code initialisation
+    //Error code defination for authentication
     const EAccountNotFound: u64 = 100;
     const EAmountExceedsBalance: u64 = 101;
     const EUserAccountNotFound: u64 = 102;
     
     public struct Bank has key, store {
-        id: UID,
+        id: UID,//unique identifier
         accounts: table::Table<address, Account>,
         value: u64,
     }
+
     //ctx: transaction content
+    //first code to be run in the code
     fun init(ctx: &mut TxContext) {
-        let bank_managet_cap = manager::create(ctx);
+        let bank_manager_cap = manager::create(ctx);
+        //the baove code will create a new bank manager capacity
         transfer::public_transfer(bank_manager_cap, ctx.sender());
+        //this will transfer the bank manager capacity to the person who signed the transaction
         let bank = Bank {
             id: object::new(ctx),
             accounts: table::new<address, Acoount>(ctx),
             value: 0
         };
+        //this will create a new bank
         transfer::share_object(bank);
+        //
     }
 
     public fun create_account(
@@ -49,7 +55,9 @@ module workshop_project::bank{
             bank: &mut Bank,
             id: u64, 
             owner: address,
-            ctx: &mut TxContext
+            ctx: &mut TxContext 
+            //ctx is the context that is passed in by the vm that runs the function
+            //ctx contains the sender, epoch, timestamp just like msg.sender, block.timestamp etc.
         ){
         let (account, accountCap) = new(owner, ctx);
         bank.accounts.add(owner, account);
